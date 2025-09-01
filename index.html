@@ -32,7 +32,7 @@
     .btn.small{padding:6px 10px;border-radius:10px}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     table{width:100%;border-collapse:collapse;table-layout:fixed}
-    thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);text-align:left;font-size:13px;color:var(--muted);padding:10px}
+    thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);text-align:left;font-size:13px;color:var(--muted);padding:10px;white-space:normal;line-height:1.2}
     tbody td{border-bottom:1px solid var(--border);padding:8px}
     tbody tr:hover{background:#fcfcff}
     tbody td input.cell{width:100%;box-sizing:border-box;font-size:14px}
@@ -49,7 +49,7 @@
     .fraction > span { display: block; padding: 0 2px; }
     .fraction .den { border-top: 1px solid #000; }
 
-    /* --- responsywność --- */
+    /* --- poprawki responsywności --- */
     #selectionRow {
       display: flex;
       flex-wrap: wrap;
@@ -68,15 +68,27 @@
         flex-direction: column;
         align-items: stretch;
       }
+      #selectionRow label,
+      #extraOptions label {
+        width: 100%;
+      }
       #selectionRow select,
       #extraOptions select,
       #selectionRow button,
       #extraOptions button {
         width: 100%;
       }
-      thead th {font-size:11px;padding:6px}
-      tbody td {padding:4px}
-      tbody td input.cell{font-size:12px;padding:6px 8px}
+      thead th {
+        font-size: 11px;
+        padding: 4px;
+      }
+      tbody td {
+        padding: 4px;
+      }
+      tbody td input.cell {
+        font-size: 12px;
+        padding: 4px 6px;
+      }
     }
   </style>
 </head>
@@ -133,7 +145,14 @@
 
       <div style="overflow:auto;margin-top:12px">
         <table>
-          <thead><tr><th>Nazwa</th><th>Masa ogólna [t]</th><th>Masa hamująca [t]</th><th></th></tr></thead>
+          <thead>
+            <tr>
+              <th>Nazwa</th>
+              <th>Masa<br>ogólna [t]</th>
+              <th>Masa<br>hamująca [t]</th>
+              <th></th>
+            </tr>
+          </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
@@ -189,20 +208,16 @@
 
       sumMassEl.textContent=fmt1(sumM);
       sumMHEl.textContent=fmt1(sumMH);
-      mhRequiredMassEl.textContent=Math.ceil(mhReqMass);   // zaokrąglone w górę
-      lambdaEl.textContent=Math.floor(pct);                // zaokrąglone w dół
+      mhRequiredMassEl.textContent=Math.ceil(mhReqMass);
+      lambdaEl.textContent=Math.floor(pct);
       mhRequiredEl.textContent=fmt1(required);
 
-      if(pct>=required){ 
-        statusMessageEl.textContent='Spełniono wymaganie'; 
-        statusMessageEl.style.color='green'; 
-      } else { 
-        statusMessageEl.textContent='Niespełnione wymaganie'; 
-        statusMessageEl.style.color='red'; 
-      }
+      if(pct>=required){ statusMessageEl.textContent='Spełniono wymaganie'; statusMessageEl.style.color='green'; }
+      else{ statusMessageEl.textContent='Niespełnione wymaganie'; statusMessageEl.style.color='red'; }
     }
 
     document.addEventListener('DOMContentLoaded',()=>render());
+    requiredPercentEl.addEventListener('input',()=>{ save(); recalc(); });
     $('#clearAll').addEventListener('click',()=>{ rows=[]; requiredPercentEl.value=''; save(); render(); });
     addRowBtn.addEventListener('click',()=>addRow());
     addSelectedBtn.addEventListener('click',()=>{
@@ -247,10 +262,16 @@
       }
     });
 
-    // Auto-przeliczanie przy wpisywaniu procentu
-    requiredPercentEl.addEventListener('input',()=>{ save(); recalc(); });
+    const saved=localStorage.getItem('brake-mass-calc-v2');
+    if(saved){
+      try{
+        const d=JSON.parse(saved);
+        if(d.rows) rows=d.rows;
+        if(d.required) requiredPercentEl.value=d.required;
+      }catch{}
+    }
+    render();
 
-    // Eksport CSV
     $('#exportCSV').addEventListener('click',()=>{
       let csv="Nazwa;Masa ogólna [t];Masa hamująca [t]\n";
       rows.forEach(r=>{ csv+=`${r.name};${r.massT};${r.mh}\n`; });
