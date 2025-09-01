@@ -35,7 +35,12 @@
     thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);text-align:left;font-size:13px;color:var(--muted);padding:10px;white-space:normal;line-height:1.2}
     tbody td{border-bottom:1px solid var(--border);padding:8px}
     tbody tr:hover{background:#fcfcff}
-    tbody td input.cell{width:100%;box-sizing:border-box;font-size:14px}
+    tbody td input.cell{
+      width:75%;        /* skrócone do 75% */
+      max-width:100px;  /* ograniczona szerokość */
+      box-sizing:border-box;
+      font-size:14px;
+    }
     .right{text-align:right}
     .muted{color:var(--muted)}
     .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:16px;font-weight:700}
@@ -86,8 +91,10 @@
         padding: 4px;
       }
       tbody td input.cell {
-        font-size: 12px;
-        padding: 4px 6px;
+        width:70%;       /* jeszcze węższe na telefonach */
+        max-width:80px;
+        font-size:12px;
+        padding:4px 6px;
       }
     }
   </style>
@@ -180,7 +187,7 @@
 
     function uid(){ return 'r'+Math.random().toString(36).slice(2)+Date.now().toString(36); }
     function parseNum(v){ const n = Number(String(v).replace(',', '.')); return Number.isFinite(n)?n:0; }
-    function fmt1(n){ return Number.isFinite(n)?n.toFixed(1).replace(/\.0$/,''):'0'; }
+    function fmt(n){ return Number.isFinite(n)?String(n):'0'; }
     function emptyRow(name='', massT='', mh=''){ return {id:uid(), name, massT, mh}; }
     function save(){ localStorage.setItem('brake-mass-calc-v2', JSON.stringify({rows, required: parseNum(requiredPercentEl.value)})); }
 
@@ -188,7 +195,10 @@
       tbody.innerHTML='';
       rows.forEach(r=>{
         const tr=document.createElement('tr'); tr.dataset.id=r.id;
-        tr.innerHTML=`<td><input type='text' data-k='name' class='cell' value='${r.name}'></td><td><input type='number' data-k='massT' class='cell right' value='${r.massT}'></td><td><input type='number' data-k='mh' class='cell right' value='${r.mh}'></td><td><button class='btn small danger' data-act='del'>Usuń</button></td>`;
+        tr.innerHTML=`<td><input type='text' data-k='name' class='cell' value='${r.name}'></td>
+                      <td><input type='number' data-k='massT' class='cell right' value='${r.massT}'></td>
+                      <td><input type='number' data-k='mh' class='cell right' value='${r.mh}'></td>
+                      <td><button class='btn small danger' data-act='del'>Usuń</button></td>`;
         tbody.appendChild(tr);
       });
       tbody.querySelectorAll('input.cell').forEach(el=>el.addEventListener('input', onCellChange));
@@ -202,23 +212,18 @@
 
     function recalc(){
       let sumM=0,sumMH=0; rows.forEach(r=>{sumM+=parseNum(r.massT); sumMH+=parseNum(r.mh);});
-      const pct=sumM>0?(sumMH/sumM*100):0;
+      const pct=sumM>0?Math.floor(sumMH/sumM*100):0; // ZAOKRĄGLANIE W DÓŁ
       const required=parseNum(requiredPercentEl.value);
-      const mhReqMass=sumM*(required/100);
-
-      sumMassEl.textContent=fmt1(sumM);
-      sumMHEl.textContent=fmt1(sumMH);
-      mhRequiredMassEl.textContent=Math.ceil(mhReqMass);
-      lambdaEl.textContent=Math.floor(pct);
-      mhRequiredEl.textContent=fmt1(required);
-
+      const mhReqMass=Math.ceil(sumM*(required/100)); // ZAOKRĄGLANIE W GÓRĘ
+      sumMassEl.textContent=fmt(sumM); sumMHEl.textContent=fmt(sumMH);
+      mhRequiredMassEl.textContent=fmt(mhReqMass); lambdaEl.textContent=fmt(pct); mhRequiredEl.textContent=fmt(required);
       if(pct>=required){ statusMessageEl.textContent='Spełniono wymaganie'; statusMessageEl.style.color='green'; }
       else{ statusMessageEl.textContent='Niespełnione wymaganie'; statusMessageEl.style.color='red'; }
     }
 
     document.addEventListener('DOMContentLoaded',()=>render());
-    requiredPercentEl.addEventListener('input',()=>{ save(); recalc(); });
     $('#clearAll').addEventListener('click',()=>{ rows=[]; requiredPercentEl.value=''; save(); render(); });
+    requiredPercentEl.addEventListener('input',()=>{ save(); recalc(); });
     addRowBtn.addEventListener('click',()=>addRow());
     addSelectedBtn.addEventListener('click',()=>{
       const name=trainGroupEl.value+' ('+trainTypeEl.value+')';
@@ -236,17 +241,18 @@
         if(trainTypeEl.value==='sluzbowy'){ addRow(name,123*units,128*units); }
         else { addRow(name,141*units,149*units); }
       } else if(trainGroupEl.value==='ER-75'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,138*units,225*units); }
-        else { addRow(name,138*units,225*units); }
+        addRow(name,138*units,225*units);
       } else if(trainGroupEl.value==='45WE'){
         if(trainTypeEl.value==='sluzbowy'){ addRow(name,160*units,312*units); }
         else { addRow(name,202*units,312*units); }
       } else if(trainGroupEl.value==='EN-76'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,135*units,226*units); }
-        else { addRow(name,166*units,281*units); }
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,150*units,225*units); }
+        else { addRow(name,183*units,225*units); }
       } else if(trainGroupEl.value==='ER-160'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,140*units,323*units); }
-        else { addRow(name,174*units,305*units); }
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,142*units,206*units); }
+        else { addRow(name,162*units,206*units); }
+      } else {
+        addRow(name,'','');
       }
     });
 
