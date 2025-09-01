@@ -32,10 +32,10 @@
     .btn.small{padding:6px 10px;border-radius:10px}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     table{width:100%;border-collapse:collapse;table-layout:fixed}
-    thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);text-align:left;font-size:13px;color:var(--muted);padding:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);text-align:left;font-size:13px;color:var(--muted);padding:10px}
     tbody td{border-bottom:1px solid var(--border);padding:8px}
     tbody tr:hover{background:#fcfcff}
-    tbody td input.cell{width:100%;box-sizing:border-box;font-size:14px;padding:8px}
+    tbody td input.cell{width:100%;box-sizing:border-box;font-size:14px}
     .right{text-align:right}
     .muted{color:var(--muted)}
     .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:16px;font-weight:700}
@@ -49,16 +49,34 @@
     .fraction > span { display: block; padding: 0 2px; }
     .fraction .den { border-top: 1px solid #000; }
 
-    /* --- poprawki responsywności --- */
-    #selectionRow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-    #extraOptions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    /* --- responsywność --- */
+    #selectionRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    #extraOptions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
     @media (max-width: 480px) {
-      #selectionRow, #extraOptions { flex-direction:column; align-items:stretch; }
-      #selectionRow label, #extraOptions label { width:100%; }
-      #selectionRow select, #extraOptions select, #selectionRow button, #extraOptions button { width:100%; }
-      thead th { font-size:11px; padding:6px; }
-      tbody td { padding:4px; }
-      tbody td input.cell { font-size:12px; padding:6px 8px; }
+      #selectionRow,
+      #extraOptions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #selectionRow select,
+      #extraOptions select,
+      #selectionRow button,
+      #extraOptions button {
+        width: 100%;
+      }
+      thead th {font-size:11px;padding:6px}
+      tbody td {padding:4px}
+      tbody td input.cell{font-size:12px;padding:6px 8px}
     }
   </style>
 </head>
@@ -86,11 +104,11 @@
         </div>
         <div class="actions">
           <button type="button" class="btn" id="clearAll">Wyczyść</button>
-          <button type="button" class="btn" id="exportCsv">Eksportuj CSV</button>
+          <button type="button" class="btn" id="exportCSV">Eksport CSV</button>
         </div>
       </div>
 
-      <div class="row" id="selectionRow" style="margin-top:12px;">
+      <div class="row" id="selectionRow" style="margin-top:12px;gap:8px;">
         <label>Grupa pociągów:</label>
         <select id="trainGroup">
           <option value="En57-AL">En57-AL</option>
@@ -138,12 +156,11 @@
     const extraOptions = $('#extraOptions');
     const addRowBtn = $('#addRow');
     const addSelectedBtn = $('#addSelected');
-    const exportBtn = $('#exportCsv');
 
     let rows = [];
 
     function uid(){ return 'r'+Math.random().toString(36).slice(2)+Date.now().toString(36); }
-    function parseNum(v){ const n = Number(String(v).replace(',', '.')); return (Number.isFinite(n)&&n>=0)?n:0; }
+    function parseNum(v){ const n = Number(String(v).replace(',', '.')); return Number.isFinite(n)?n:0; }
     function fmt1(n){ return Number.isFinite(n)?n.toFixed(1).replace(/\.0$/,''):'0'; }
     function emptyRow(name='', massT='', mh=''){ return {id:uid(), name, massT, mh}; }
     function save(){ localStorage.setItem('brake-mass-calc-v2', JSON.stringify({rows, required: parseNum(requiredPercentEl.value)})); }
@@ -169,33 +186,53 @@
       const pct=sumM>0?(sumMH/sumM*100):0;
       const required=parseNum(requiredPercentEl.value);
       const mhReqMass=sumM*(required/100);
-      sumMassEl.textContent=fmt1(sumM); sumMHEl.textContent=fmt1(sumMH);
-      mhRequiredMassEl.textContent=fmt1(mhReqMass); lambdaEl.textContent=fmt1(pct); mhRequiredEl.textContent=fmt1(required);
-      if(pct>=required){ statusMessageEl.textContent='Spełniono wymaganie'; statusMessageEl.style.color='green'; }
-      else{ statusMessageEl.textContent='Niespełnione wymaganie'; statusMessageEl.style.color='red'; }
+
+      sumMassEl.textContent=fmt1(sumM);
+      sumMHEl.textContent=fmt1(sumMH);
+      mhRequiredMassEl.textContent=Math.ceil(mhReqMass);   // zaokrąglone w górę
+      lambdaEl.textContent=Math.floor(pct);                // zaokrąglone w dół
+      mhRequiredEl.textContent=fmt1(required);
+
+      if(pct>=required){ 
+        statusMessageEl.textContent='Spełniono wymaganie'; 
+        statusMessageEl.style.color='green'; 
+      } else { 
+        statusMessageEl.textContent='Niespełnione wymaganie'; 
+        statusMessageEl.style.color='red'; 
+      }
     }
 
     document.addEventListener('DOMContentLoaded',()=>render());
     $('#clearAll').addEventListener('click',()=>{ rows=[]; requiredPercentEl.value=''; save(); render(); });
     addRowBtn.addEventListener('click',()=>addRow());
-
-    const trainData = {
-      "En57-AL": { czynny:[147,162], sluzbowy:[132,130] },
-      "En57-AKM(2013)": { czynny:[141,169], sluzbowy:[126,169] },
-      "EW-60": { czynny:[147,165], sluzbowy:[132,136] },
-      "AKM Stare": { czynny:[141,149], sluzbowy:[123,128] },
-      "ER-75": { czynny:[138,225], sluzbowy:[118,173] },
-      "45WE": { czynny:[202,312], sluzbowy:[160,312] },
-      "EN-76": { czynny:[166,281], sluzbowy:[135,226] },
-      "ER-160": { czynny:[174,305], sluzbowy:[140,323] },
-    };
-
     addSelectedBtn.addEventListener('click',()=>{
-      const type=trainTypeEl.value;
+      const name=trainGroupEl.value+' ('+trainTypeEl.value+')';
       const units=parseNum(unitCountEl.value);
-      const name=`${trainGroupEl.value} (${type})`;
-      const data=trainData[trainGroupEl.value];
-      if(data){ const [mass,mh]=data[type]; addRow(name,mass*units,mh*units); }
+      if(trainGroupEl.value==='En57-AL'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,132*units,130*units); }
+        else { addRow(name,147*units,162*units); }
+      } else if(trainGroupEl.value==='En57-AKM(2013)'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,126*units,169*units); }
+        else { addRow(name,141*units,169*units); }
+      } else if(trainGroupEl.value==='EW-60'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,132*units,136*units); }
+        else { addRow(name,147*units,165*units); }
+      } else if(trainGroupEl.value==='AKM Stare'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,123*units,128*units); }
+        else { addRow(name,141*units,149*units); }
+      } else if(trainGroupEl.value==='ER-75'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,138*units,225*units); }
+        else { addRow(name,138*units,225*units); }
+      } else if(trainGroupEl.value==='45WE'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,160*units,312*units); }
+        else { addRow(name,202*units,312*units); }
+      } else if(trainGroupEl.value==='EN-76'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,135*units,226*units); }
+        else { addRow(name,166*units,281*units); }
+      } else if(trainGroupEl.value==='ER-160'){
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,140*units,323*units); }
+        else { addRow(name,174*units,305*units); }
+      }
     });
 
     trainGroupEl.addEventListener('change',()=>{
@@ -210,18 +247,18 @@
       }
     });
 
-    // Live przeliczanie procentu
+    // Auto-przeliczanie przy wpisywaniu procentu
     requiredPercentEl.addEventListener('input',()=>{ save(); recalc(); });
 
     // Eksport CSV
-    exportBtn.addEventListener('click',()=>{
+    $('#exportCSV').addEventListener('click',()=>{
       let csv="Nazwa;Masa ogólna [t];Masa hamująca [t]\n";
       rows.forEach(r=>{ csv+=`${r.name};${r.massT};${r.mh}\n`; });
-      csv+=`\nSUMA;${sumMassEl.textContent};${sumMHEl.textContent}\n`;
-      csv+=`Procent wymagany;${mhRequiredEl.textContent}%\n`;
-      csv+=`Procent rzeczywisty;${lambdaEl.textContent}%\n`;
-      csv+=`Masa hamująca wymagana;${mhRequiredMassEl.textContent} t\n`;
-
+      csv+=`\nSuma masy ogólnej;${sumMassEl.textContent}\n`;
+      csv+=`Suma masy hamującej;${sumMHEl.textContent}\n`;
+      csv+=`Masa hamująca wymagana;${mhRequiredMassEl.textContent}\n`;
+      csv+=`Procent rzeczywisty;${lambdaEl.textContent}\n`;
+      csv+=`Procent wymagany;${mhRequiredEl.textContent}\n`;
       const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
       const link=document.createElement("a");
       link.href=URL.createObjectURL(blob);
