@@ -241,7 +241,8 @@
         if(trainTypeEl.value==='sluzbowy'){ addRow(name,123*units,128*units); }
         else { addRow(name,141*units,149*units); }
       } else if(trainGroupEl.value==='ER-75'){
-        addRow(name,138*units,225*units);
+        if(trainTypeEl.value==='sluzbowy'){ addRow(name,118*units,173*units); }
+        else { addRow(name,138*units,225*units); };
       } else if(trainGroupEl.value==='45WE'){
         if(trainTypeEl.value==='sluzbowy'){ addRow(name,160*units,312*units); }
         else { addRow(name,202*units,312*units); }
