@@ -1,298 +1,275 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kalkulator mas hamujących</title>
-  <style>
-    :root{--bg:#f7f7fb;--card:#ffffff;--text:#1f2937;--muted:#6b7280;--primary:#4f46e5;--primary-600:#4338ca;--green:#059669;--red:#dc2626;--border:#e5e7eb;}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--text)}
-    .container{max-width:1100px;margin:0 auto;padding:24px}
-    h1{font-size:clamp(24px,2.5vw,34px);margin:0 0 6px;font-weight:700}
-    p.lead{margin:0 0 18px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
-    @media(min-width:900px){.grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
-    .stat{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);text-align:center}
-    .stat .label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-    .stat .value{font-size:24px;font-weight:700;margin-top:4px}
-    .stat.green{border-color:var(--green);background:#ecfdf5}
-    .stat.red{border-color:var(--red);background:#fef2f2}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-top:16px}
-    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-    .field{display:flex;flex-direction:column;gap:6px}
-    .field label{font-size:14px;color:var(--muted)}
-    input[type="number"],input[type="text"],select{appearance:none;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px;min-width:120px;outline:none}
-    input:focus, select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.15)}
-    .btn{border:1px solid var(--border);background:#fff;border-radius:14px;padding:10px 14px;font-weight:600;cursor:pointer}
-    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-    .btn.primary:hover{background:var(--primary-600)}
-    .btn:hover{filter:brightness(.98)}
-    .btn.danger{color:var(--red);border-color:#fecaca;background:#fff}
-    .btn.small{padding:6px 10px;border-radius:10px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    table{width:100%;border-collapse:collapse;table-layout:fixed}
-    thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);text-align:left;font-size:13px;color:var(--muted);padding:10px;white-space:normal;line-height:1.2}
-    tbody td{border-bottom:1px solid var(--border);padding:8px}
-    tbody tr:hover{background:#fcfcff}
-    tbody td input.cell{
-      width:75%;        /* skrócone do 75% */
-      max-width:100px;  /* ograniczona szerokość */
-      box-sizing:border-box;
-      font-size:14px;
-    }
-    .right{text-align:right}
-    .muted{color:var(--muted)}
-    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:16px;font-weight:700}
-    .badge.good{background:#ecfdf5;color:var(--green)}
-    .badge.bad{background:#fef2f2;color:var(--red)}
-    .status-message{font-size:24px;font-weight:700;margin-top:16px;text-align:center}
-    .disclaimer{font-size:13px;color:var(--red);margin-top:6px;text-align:center}
-    details{margin-top:12px}
-    details summary{cursor:pointer;color:var(--primary);font-weight:600}
-    .fraction { display: inline-block; text-align: center; }
-    .fraction > span { display: block; padding: 0 2px; }
-    .fraction .den { border-top: 1px solid #000; }
-
-    /* --- poprawki responsywności --- */
-    #selectionRow {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-    #extraOptions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-    @media (max-width: 480px) {
-      #selectionRow,
-      #extraOptions {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      #selectionRow label,
-      #extraOptions label {
-        width: 100%;
-      }
-      #selectionRow select,
-      #extraOptions select,
-      #selectionRow button,
-      #extraOptions button {
-        width: 100%;
-      }
-      thead th {
-        font-size: 11px;
-        padding: 4px;
-      }
-      tbody td {
-        padding: 4px;
-      }
-      tbody td input.cell {
-        width:70%;       /* jeszcze węższe na telefonach */
-        max-width:80px;
-        font-size:12px;
-        padding:4px 6px;
-      }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kalkulator mas hamujących</title>
+<style>
+:root{--bg:#f7f7fb;--card:#ffffff;--text:#1f2937;--muted:#6b7280;--primary:#4f46e5;--primary-600:#4338ca;--green:#059669;--red:#dc2626;--border:#e5e7eb;}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--text)}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+h1{font-size:clamp(24px,2.5vw,34px);margin:0 0 6px;font-weight:700}
+p.lead{margin:0 0 18px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+@media(min-width:900px){.grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);text-align:center}
+.stat .label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat .value{font-size:24px;font-weight:700;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-top:16px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;color:var(--muted)}
+input[type="number"],input[type="text"],select{appearance:none;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px;min-width:120px;outline:none}
+input:focus, select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+.btn{border:1px solid var(--border);background:#fff;border-radius:14px;padding:10px 14px;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-600)}
+.btn:hover{filter:brightness(.98)}
+.btn.danger{color:var(--red);border-color:#fecaca;background:#fff}
+.btn.small{padding:6px 10px;border-radius:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);text-align:left;font-size:13px;color:var(--muted);padding:10px;white-space:normal;line-height:1.2}
+tbody td{border-bottom:1px solid var(--border);padding:8px}
+tbody tr:hover{background:#fcfcff}
+tbody td input.cell {font-size: 14px;padding: 4px 6px;box-sizing: border-box;}
+input[data-k="name"] {width: 15ch; min-width: 15ch;}
+input[data-k="massT"], input[data-k="mh"], input[data-k="length"] {width: 8ch; min-width: 8ch;text-align: right;}
+.right{text-align:right}
+.muted{color:var(--muted)}
+.status-message{font-size:24px;font-weight:700;margin-top:16px;text-align:center}
+.disclaimer{font-size:18px;color:var(--red);margin-top:6px;text-align:center}
+details{margin-top:12px}
+details summary{cursor:pointer;color:var(--primary);font-weight:600}
+.fraction { display: inline-block; text-align: center; }
+.fraction > span { display: block; padding: 0 2px; }
+.fraction .den { border-top: 1px solid #000; }
+#wagonButtons { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; display:none; }
+@media (max-width: 480px) {
+#selectionRow, #extraOptions, #wagonButtons {flex-direction:column; align-items:stretch;}
+#selectionRow label, #extraOptions label {width:100%;}
+#selectionRow select, #extraOptions select, #selectionRow button, #extraOptions button {width:100%;}
+thead th {font-size:11px; padding:4px;}
+tbody td {padding:4px;}
+tbody td input.cell {width:70%; max-width:80px; font-size:12px; padding:4px 6px;}
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Kalkulator mas hamujących pociągu</h1>
-    <p class="lead">Wpisz dane pociągu: nazwa, masa ogólna, masa hamująca oraz procent wymagany. Kalkulator obliczy <strong>suma masy ogólnej</strong>, <strong>suma masy hamującej</strong>, <strong>masa hamująca wymagana</strong>, <strong>procent rzeczywisty</strong> i porówna z wymaganiami.</p>
+<div class="container">
+<h1>Kalkulator mas hamujących pociągu</h1>
+<p class="lead">Wpisz dane pociągu: nazwa, masa ogólna, masa hamująca oraz procent wymagany. Kalkulator obliczy <strong>suma masy ogólnej</strong>, <strong>suma masy hamującej</strong>, <strong>suma długości</strong>, <strong>masa hamująca wymagana</strong>, <strong>procent rzeczywisty</strong> i porówna z wymaganiami.</p>
 
-    <div id="stats" class="grid">
-      <div class="stat" id="statMass"><div class="label">Masa ogólna pociągu</div><div class="value"><span id="sumMass">0</span> <span class="muted">t</span></div></div>
-      <div class="stat" id="statMH"><div class="label">Masa hamująca rzeczywista</div><div class="value"><span id="sumMH">0</span> <span class="muted">t</span></div></div>
-      <div class="stat" id="statMHReq"><div class="label">Masa hamująca wymagana</div><div class="value"><span id="mhRequiredMass">0</span> <span class="muted">t</span></div></div>
-      <div class="stat" id="statRealPct"><div class="label">Procent rzeczywisty</div><div class="value"><span id="lambda">0</span>%</div></div>
-      <div class="stat" id="statReqPct"><div class="label">Procent wymagany</div><div class="value"><span id="mhRequired">0</span>%</div></div>
-    </div>
+<div id="stats" class="grid">
+  <div class="stat"><div class="label">Masa ogólna pociągu</div><div class="value"><span id="sumMass">0</span> <span class="muted">t</span></div></div>
+  <div class="stat"><div class="label">Masa hamująca wymagana</div><div class="value"><span id="mhRequiredMass">0</span> <span class="muted">t</span></div></div>
+  <div class="stat"><div class="label">Masa hamująca rzeczywista</div><div class="value"><span id="sumMH">0</span> <span class="muted">t</span></div></div>
+  <div class="stat"><div class="label">Procent wymagany</div><div class="value"><span id="mhRequired">0</span>%</div></div>
+  <div class="stat"><div class="label">Procent rzeczywisty</div><div class="value"><span id="lambda">0</span>%</div></div>
+  <div class="stat"><div class="label">Długość całkowita</div><div class="value"><span id="sumLen">0</span> <span class="muted">m</span></div></div>
+</div>
 
-    <div class="status-message" id="statusMessage">Niespełnione wymaganie</div>
-    <div class="disclaimer">Ten kalkulator jest projektem w fazie rozwoju i może zawierać błędy. PAMIĘTAJ!!!, że żadne narzędzie nie zastąpi samodzielnego myślenia i weryfikacji danych.</div>
+<div class="status-message" id="statusMessage">Niespełnione wymaganie</div>
+<div class="disclaimer">Ten kalkulator jest projektem w fazie rozwoju i może zawierać błędy. PAMIĘTAJ!!!, że żadne narzędzie nie zastąpi samodzielnego myślenia i weryfikacji danych.</div>
 
-    <div class="card">
-      <div class="row" style="justify-content:space-between;gap:16px">
-        <div class="field">
-          <label>Wymagany procent masy hamującej [%]</label>
-          <input type="number" step="0.1" id="requiredPercent" placeholder="np. 147" />
-        </div>
-        <div class="actions">
-          <button type="button" class="btn" id="clearAll">Wyczyść</button>
-          <button type="button" class="btn" id="exportCSV">Eksport CSV</button>
-        </div>
-      </div>
-
-      <div class="row" id="selectionRow" style="margin-top:12px;gap:8px;">
-        <label>Grupa pociągów:</label>
-        <select id="trainGroup">
-          <option value="En57-AL">En57-AL</option>
-          <option value="En57-AKM(2013)">En57-AKM(2013)</option>
-          <option value="AKM Stare">AKM Stare</option>
-          <option value="EW-60">EW-60</option>
-          <option value="ER-75">ER-75</option>
-          <option value="45WE">45WE</option>
-          <option value="EN-76">EN-76</option>
-          <option value="ER-160">ER-160</option>
-          <option value="Inne">Inne</option>
-        </select>
-        <div id="extraOptions">
-          <label>Rodzaj:</label>
-          <select id="trainType"><option value="czynny">Czynny</option><option value="sluzbowy">Służbowy</option></select>
-          <label>Ilość jednostek:</label>
-          <select id="unitCount"><option value="1">1 jednostka</option><option value="2">2 jednostki</option><option value="3">3 jednostki</option></select>
-          <button type="button" class="btn small" id="addSelected">Dodaj wybrany</button>
-        </div>
-        <button type="button" class="btn primary" id="addRow" style="display:none;">Dodaj pojazd</button>
-      </div>
-
-      <div style="overflow:auto;margin-top:12px">
-        <table>
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Masa<br>ogólna [t]</th>
-              <th>Masa<br>hamująca [t]</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-
-      <details>
-        <summary>Pokaż wzory</summary>
-        <div style="margin-top:8px">
-          <div>Procent rzeczywisty = <span class="fraction"><span class="num">suma masy hamującej</span><span class="den">suma masy ogólnej</span></span> × 100%</div>
-          <div>Masa hamująca wymagana = <span class="fraction"><span class="num">procent wymagany</span><span class="den">100</span></span> × suma masy ogólnej</div>
-        </div>
-      </details>
-    </div>
+<div class="card">
+<div class="row" style="justify-content:space-between;gap:16px">
+  <div class="field">
+    <label>Wymagany procent masy hamującej [%]</label>
+    <input type="number" step="0.1" id="requiredPercent" placeholder="np. 147" />
   </div>
+  <div class="actions">
+    <button type="button" class="btn" id="clearAll">Wyczyść</button>
+    <button type="button" class="btn" id="exportCSV">Eksport CSV</button>
+  </div>
+</div>
 
-  <script>
-    const $ = (s) => document.querySelector(s);
-    const tbody = $('#tbody'), sumMassEl = $('#sumMass'), sumMHEl = $('#sumMH'), lambdaEl = $('#lambda'), mhRequiredEl = $('#mhRequired'), mhRequiredMassEl = $('#mhRequiredMass');
-    const requiredPercentEl = $('#requiredPercent'), statusMessageEl = $('#statusMessage');
-    const trainGroupEl = $('#trainGroup'), trainTypeEl = $('#trainType'), unitCountEl = $('#unitCount');
-    const extraOptions = $('#extraOptions');
-    const addRowBtn = $('#addRow');
-    const addSelectedBtn = $('#addSelected');
+<div class="row" id="selectionRow" style="margin-top:12px;gap:8px;">
+<label>Grupa pociągów:</label>
+<select id="trainGroup">
+  <option value="En57-AL">En57-AL</option>
+  <option value="En57-AKM(2013)">En57-AKM(2013)</option>
+  <option value="AKM Stare">AKM Stare</option>
+  <option value="EW-60">EW-60</option>
+  <option value="ER-75">ER-75</option>
+  <option value="45WE">45WE</option>
+  <option value="EN-76">EN-76</option>
+  <option value="ER-160">ER-160</option>
+  <option value="EU-47">EU-47</option>
+  <option value="Inne">Inne</option>
+</select>
 
-    let rows = [];
+<div id="extraOptions">
+  <label>Rodzaj:</label>
+  <select id="trainType"><option value="czynny">Czynny</option><option value="sluzbowy">Służbowy</option></select>
+  <button type="button" class="btn small" id="addSelected">Dodaj wybrany</button>
+</div>
+<button type="button" class="btn primary" id="addRow" style="display:none;">Dodaj pojazd</button>
+</div>
 
-    function uid(){ return 'r'+Math.random().toString(36).slice(2)+Date.now().toString(36); }
-    function parseNum(v){ const n = Number(String(v).replace(',', '.')); return Number.isFinite(n)?n:0; }
-    function fmt(n){ return Number.isFinite(n)?String(n):'0'; }
-    function emptyRow(name='', massT='', mh=''){ return {id:uid(), name, massT, mh}; }
-    function save(){ localStorage.setItem('brake-mass-calc-v2', JSON.stringify({rows, required: parseNum(requiredPercentEl.value)})); }
+<div id="wagonButtons">
+  <button type="button" class="btn small" data-wagon="1">Wagon Sterowniczy</button>
+  <button type="button" class="btn small" data-wagon="2">Bombardier</button>
+  <button type="button" class="btn small" data-wagon="3">PESA</button>
+</div>
 
-    function render(){
-      tbody.innerHTML='';
-      rows.forEach(r=>{
-        const tr=document.createElement('tr'); tr.dataset.id=r.id;
-        tr.innerHTML=`<td><input type='text' data-k='name' class='cell' value='${r.name}'></td>
-                      <td><input type='number' data-k='massT' class='cell right' value='${r.massT}'></td>
-                      <td><input type='number' data-k='mh' class='cell right' value='${r.mh}'></td>
-                      <td><button class='btn small danger' data-act='del'>Usuń</button></td>`;
-        tbody.appendChild(tr);
-      });
-      tbody.querySelectorAll('input.cell').forEach(el=>el.addEventListener('input', onCellChange));
-      tbody.querySelectorAll('button[data-act="del"]').forEach(b=>b.addEventListener('click', onDelete));
-      recalc();
-    }
+<div style="overflow:auto;margin-top:5px">
+<table>
+<thead>
+<tr>
+  <th>Nazwa<br>pojazdu</th>
+  <th>Masa<br>ogólna [t]</th>
+  <th>Masa<br>hamująca [t]</th>
+  <th>Długość [m]</th>
+  <th></th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
 
-    function addRow(name='', massT='', mh=''){ rows.push(emptyRow(name,massT,mh)); save(); render(); }
-    function onCellChange(e){ const tr=e.target.closest('tr'); const r=rows.find(x=>x.id===tr.dataset.id); if(r){ r[e.target.dataset.k]=e.target.value; save(); recalc(); }}
-    function onDelete(e){ const tr=e.target.closest('tr'); rows=rows.filter(r=>r.id!==tr.dataset.id); save(); render(); }
+<details>
+<summary>Pokaż wzory</summary>
+<div style="margin-top:8px">
+  <div>Procent rzeczywisty = <span class="fraction"><span class="num">suma masy hamującej</span><span class="den">suma masy ogólnej</span></span> × 100%</div>
+  <div>Masa hamująca wymagana = <span class="fraction"><span class="num">procent wymagany</span><span class="den">100</span></span> × suma masy ogólnej</div>
+</div>
+</details>
+</div>
 
-    function recalc(){
-      let sumM=0,sumMH=0; rows.forEach(r=>{sumM+=parseNum(r.massT); sumMH+=parseNum(r.mh);});
-      const pct=sumM>0?Math.floor(sumMH/sumM*100):0; // ZAOKRĄGLANIE W DÓŁ
-      const required=parseNum(requiredPercentEl.value);
-      const mhReqMass=Math.ceil(sumM*(required/100)); // ZAOKRĄGLANIE W GÓRĘ
-      sumMassEl.textContent=fmt(sumM); sumMHEl.textContent=fmt(sumMH);
-      mhRequiredMassEl.textContent=fmt(mhReqMass); lambdaEl.textContent=fmt(pct); mhRequiredEl.textContent=fmt(required);
-      if(pct>=required){ statusMessageEl.textContent='Spełniono wymaganie'; statusMessageEl.style.color='green'; }
-      else{ statusMessageEl.textContent='Niespełnione wymaganie'; statusMessageEl.style.color='red'; }
-    }
+<script>
+const $ = (s) => document.querySelector(s);
+const tbody = $('#tbody'),
+      sumMassEl = $('#sumMass'),
+      sumMHEl = $('#sumMH'),
+      sumLenEl = $('#sumLen'),
+      lambdaEl = $('#lambda'),
+      mhRequiredEl = $('#mhRequired'),
+      mhRequiredMassEl = $('#mhRequiredMass'),
+      requiredPercentEl = $('#requiredPercent'),
+      statusMessageEl = $('#statusMessage'),
+      trainGroupEl = $('#trainGroup'),
+      trainTypeEl = $('#trainType'),
+      extraOptions = $('#extraOptions'),
+      addRowBtn = $('#addRow'),
+      addSelectedBtn = $('#addSelected'),
+      wagonButtons = $('#wagonButtons');
 
-    document.addEventListener('DOMContentLoaded',()=>render());
-    $('#clearAll').addEventListener('click',()=>{ rows=[]; requiredPercentEl.value=''; save(); render(); });
-    requiredPercentEl.addEventListener('input',()=>{ save(); recalc(); });
-    addRowBtn.addEventListener('click',()=>addRow());
-    addSelectedBtn.addEventListener('click',()=>{
-      const name=trainGroupEl.value+' ('+trainTypeEl.value+')';
-      const units=parseNum(unitCountEl.value);
-      if(trainGroupEl.value==='En57-AL'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,132*units,130*units); }
-        else { addRow(name,147*units,162*units); }
-      } else if(trainGroupEl.value==='En57-AKM(2013)'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,126*units,169*units); }
-        else { addRow(name,141*units,169*units); }
-      } else if(trainGroupEl.value==='EW-60'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,129*units,136*units); }
-        else { addRow(name,144*units,165*units); }
-      } else if(trainGroupEl.value==='AKM Stare'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,123*units,128*units); }
-        else { addRow(name,141*units,149*units); }
-      } else if(trainGroupEl.value==='ER-75'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,118*units,173*units); }
-        else { addRow(name,138*units,225*units); };
-      } else if(trainGroupEl.value==='45WE'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,160*units,312*units); }
-        else { addRow(name,202*units,312*units); }
-      } else if(trainGroupEl.value==='EN-76'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,135*units,226*units); }
-        else { addRow(name,155*units,281*units); }
-      } else if(trainGroupEl.value==='ER-160'){
-        if(trainTypeEl.value==='sluzbowy'){ addRow(name,140*units,232*units); }
-        else { addRow(name,174*units,305*units); }
-      } else {
-        addRow(name,'','');
-      }
-    });
+let rows = [];
 
-    trainGroupEl.addEventListener('change',()=>{
-      if(trainGroupEl.value==='Inne'){
-        extraOptions.style.display='none';
-        addSelectedBtn.style.display='none';
-        addRowBtn.style.display='inline-block';
-      } else {
-        extraOptions.style.display='flex';
-        addSelectedBtn.style.display='inline-block';
-        addRowBtn.style.display='none';
-      }
-    });
+const trainData = {
+  "En57-AL": {czynny:{massT:147,mh:162,length:65}, sluzbowy:{massT:132,mh:130,length:65}},
+  "En57-AKM(2013)": {czynny:{massT:141,mh:169,length:65}, sluzbowy:{massT:126,mh:169,length:65}},
+  "AKM Stare": {czynny:{massT:141,mh:149,length:65}, sluzbowy:{massT:123,mh:128,length:65}},
+  "EW-60": {czynny:{massT:144,mh:165,length:65}, sluzbowy:{massT:129,mh:136,length:65}},
+  "ER-75": {czynny:{massT:138,mh:225,length:74.28}, sluzbowy:{massT:118,mh:173,length:74.28}},
+  "45WE": {czynny:{massT:202,mh:312,length:90.40}, sluzbowy:{massT:160,mh:312,length:90.40}},
+  "EN-76": {czynny:{massT:155,mh:281,length:75.25}, sluzbowy:{massT:135,mh:226,length:75.25}},
+  "ER-160": {czynny:{massT:174,mh:305,length:98.20}, sluzbowy:{massT:140,mh:232,length:98.20}},
+  "EU-47": {czynny:{massT:82,mh:138,length:18.90}, sluzbowy:{massT:82,mh:138,length:18.90}}
+};
 
-    const saved=localStorage.getItem('brake-mass-calc-v2');
-    if(saved){
-      try{
-        const d=JSON.parse(saved);
-        if(d.rows) rows=d.rows;
-        if(d.required) requiredPercentEl.value=d.required;
-      }catch{}
-    }
-    render();
+const wagonData = {
+  "1": {czynny:{massT:59,mh:127,length:27.20}, sluzbowy:{massT:53,mh:127,length:27.20}}, //wagon sterowniczy 
+  "2": {czynny:{massT:60,mh:128,length:26.80}, sluzbowy:{massT:50,mh:128,length:26.80}}, //wagon srodkowy bombardier 
+  "3": {czynny:{massT:71,mh:138,length:25.80}, sluzbowy:{massT:56,mh:138,length:25.80}}  //wagon srodkowy pesa
+};
 
-    $('#exportCSV').addEventListener('click',()=>{
-      let csv="Nazwa;Masa ogólna [t];Masa hamująca [t]\n";
-      rows.forEach(r=>{ csv+=`${r.name};${r.massT};${r.mh}\n`; });
-      csv+=`\nSuma masy ogólnej;${sumMassEl.textContent}\n`;
-      csv+=`Suma masy hamującej;${sumMHEl.textContent}\n`;
-      csv+=`Masa hamująca wymagana;${mhRequiredMassEl.textContent}\n`;
-      csv+=`Procent rzeczywisty;${lambdaEl.textContent}\n`;
-      csv+=`Procent wymagany;${mhRequiredEl.textContent}\n`;
-      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-      const link=document.createElement("a");
-      link.href=URL.createObjectURL(blob);
-      link.download="kalkulator_mas_hamujacych.csv";
-      link.click();
-    });
-  </script>
+function uid(){ return 'r'+Math.random().toString(36).slice(2)+Date.now().toString(36); }
+function parseNum(v){ const n = Number(String(v).replace(',', '.')); return Number.isFinite(n)?n:0; }
+function fmt(n){ return Number.isFinite(n)?String(n):'0'; }
+function emptyRow(name='', massT='', mh='', length=''){ return {id:uid(), name, massT, mh, length}; }
+function save(){ localStorage.setItem('brake-mass-calc-v3', JSON.stringify({rows, required: parseNum(requiredPercentEl.value)})); }
+
+function render(){
+  tbody.innerHTML='';
+  rows.forEach(r=>{
+    const tr=document.createElement('tr'); tr.dataset.id=r.id;
+    tr.innerHTML=`<td><input type='text' data-k='name' class='cell' value='${r.name}'></td>
+                  <td><input type='number' data-k='massT' class='cell right' value='${r.massT}'></td>
+                  <td><input type='number' data-k='mh' class='cell right' value='${r.mh}'></td>
+                  <td><input type='number' data-k='length' class='cell right' value='${r.length}'></td>
+                  <td><button class='btn small danger' data-act='del'>Usuń</button></td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll('input.cell').forEach(el=>el.addEventListener('input', onCellChange));
+  tbody.querySelectorAll('button[data-act="del"]').forEach(b=>b.addEventListener('click', onDelete));
+  recalc();
+}
+
+function addRow(name='', massT='', mh='', length=''){ rows.push(emptyRow(name,massT,mh,length)); save(); render(); }
+function onCellChange(e){ const tr=e.target.closest('tr'); const r=rows.find(x=>x.id===tr.dataset.id); if(r){ r[e.target.dataset.k]=e.target.value; save(); recalc(); }}
+function onDelete(e){ const tr=e.target.closest('tr'); rows=rows.filter(r=>r.id!==tr.dataset.id); save(); render(); }
+
+function recalc(){
+  let sumM=0,sumMH=0,sumLen=0;
+  rows.forEach(r=>{ sumM+=parseNum(r.massT); sumMH+=parseNum(r.mh); sumLen+=parseNum(r.length); });
+  const pct=sumM>0?Math.floor(sumMH/sumM*100):0;
+  const required=parseNum(requiredPercentEl.value);
+  const mhReqMass=Math.ceil(sumM*(required/100));
+  sumMassEl.textContent=fmt(sumM);
+  sumMHEl.textContent=fmt(sumMH);
+  sumLenEl.textContent = fmt(Math.ceil(sumLen));
+  mhRequiredMassEl.textContent=fmt(mhReqMass);
+  lambdaEl.textContent=fmt(pct);
+  mhRequiredEl.textContent=fmt(required);
+  if(pct>=required){ statusMessageEl.textContent='Spełniono wymaganie'; statusMessageEl.style.color='green'; }
+  else{ statusMessageEl.textContent='Niespełnione wymaganie'; statusMessageEl.style.color='red'; }
+}
+
+document.addEventListener('DOMContentLoaded',()=>render());
+$('#clearAll').addEventListener('click',()=>{ rows=[]; requiredPercentEl.value=''; save(); render(); });
+requiredPercentEl.addEventListener('input',()=>{ save(); recalc(); });
+addRowBtn.addEventListener('click',()=>addRow());
+
+// Dodaj wybrany pojazd
+addSelectedBtn.addEventListener('click',()=>{
+  const type = trainTypeEl.value;
+  if(trainGroupEl.value === 'EU-47'){
+    const name = `EU-47 (${type})`;
+    const data = trainData['EU-47'][type];
+    addRow(name, data.massT, data.mh, data.length);
+  } else {
+    const name = `${trainGroupEl.value} (${type})`;
+    const data = trainData[trainGroupEl.value]?.[type];
+    if(data){ addRow(name, data.massT, data.mh, data.length); }
+    else{ addRow(name,'','',''); }
+  }
+});
+
+// Przyciski wagonów
+wagonButtons.querySelectorAll('button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const w = b.dataset.wagon;
+    const type = trainTypeEl.value;
+    const data = wagonData[w][type];
+    let name = '';
+    if(w==='1') name = `Wagon Sterowniczy (${type})`;
+    else if(w==='2') name = `Bombardier (${type})`;
+    else if(w==='3') name = `PESA (${type})`;
+    addRow(name, data.massT, data.mh, data.length);
+  });
+});
+
+// Obsługa zmiany grupy pociągów
+trainGroupEl.addEventListener('change',()=>{
+  if(trainGroupEl.value==='Inne'){ extraOptions.style.display='none'; addSelectedBtn.style.display='none'; addRowBtn.style.display='inline-block'; wagonButtons.style.display='none'; }
+  else{ extraOptions.style.display='flex'; addSelectedBtn.style.display='inline-block'; addRowBtn.style.display='none'; wagonButtons.style.display=(trainGroupEl.value==='EU-47')?'flex':'none'; }
+});
+
+const saved=localStorage.getItem('brake-mass-calc-v3');
+if(saved){ try{ const d=JSON.parse(saved); if(d.rows) rows=d.rows; if(d.required) requiredPercentEl.value=d.required; }catch{} }
+render();
+
+$('#exportCSV').addEventListener('click',()=>{
+  let csv="Nazwa;Masa ogólna [t];Masa hamująca [t];Długość [m]\n";
+  rows.forEach(r=>{ csv+=`${r.name};${r.massT};${r.mh};${r.length}\n`; });
+  csv+=`\nSuma masy ogólnej;${sumMassEl.textContent}\nMasa hamująca wymagana;${mhRequiredMassEl.textContent}\nSuma masy hamującej;${sumMHEl.textContent}\nProcent wymagany;${mhRequiredEl.textContent}\nProcent rzeczywisty;${lambdaEl.textContent}\nSuma długości;${sumLenEl.textContent}\n`;
+  const blob=new Blob([csv],{type:"text/csv"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;a.download='kalkulator_mas.csv';a.click();URL.revokeObjectURL(url);
+});
+</script>
 </body>
 </html>
